@@ -18,8 +18,11 @@ func NewCache() *Cache {
 	if c == "" {
 		c = "redis://localhost:6379"
 	}
+	return newCache(c)
+}
 
-	opt, err := redis.ParseURL(c)
+func newCache(url string) *Cache {
+	opt, err := redis.ParseURL(url)
 	if err != nil {
 		log.Fatalf("Error parsing cache URL: %v", err)
 	}
@@ -30,7 +33,23 @@ func NewCache() *Cache {
 
 }
 
+func NewCacheWithURL(rurl string) *Cache {
+	return newCache(rurl)
+}
+
+func (c *Cache) Exists(key string) bool {
+	exists, err := c.con.Exists(c.ctx, key).Result()
+	if exists == 0 || err != nil {
+		return false
+	}
+	return true
+}
+
 func (c *Cache) Set(key, val string) error {
+	return c.con.Set(c.ctx, key, val, 0).Err()
+}
+
+func (c *Cache) SetWithExpires(key, val string) error {
 	return c.con.Set(c.ctx, key, val, 0).Err()
 }
 

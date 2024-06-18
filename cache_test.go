@@ -34,3 +34,18 @@ func TestSetGetDelete(t *testing.T) {
 	keys, _ = c.GetKeys()
 	assert.Len(t, keys, 0)
 }
+
+func TestExists(t *testing.T) {
+	c := storagehelper.NewCache()
+	key := "iamakey"
+	val := "iamavalue"
+	err := c.Set(key, val)
+	assert.Nil(t, err)
+
+	f := c.Exists(key)
+	assert.True(t, f)
+
+	f = c.Exists("notarealkey")
+	assert.False(t, f)
+
+}
